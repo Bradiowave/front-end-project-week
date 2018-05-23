@@ -3,7 +3,6 @@ import './App.css';
 import { Route } from 'react-router-dom';
 import axios from 'axios';
 
-import notesList from './notes-list.js';
 import Sidebar from './components/Sidebar/Sidebar.js';
 import ListView from './components/ListView/ListView.js';
 import CreateNote from './components/CreateNote/CreateNote.js';
@@ -33,6 +32,15 @@ class App extends Component {
         .catch(err => {console.log(err)})
   }
 
+  addCreatedNote = (title, textBody, _id) => {
+    let createdNote = {
+      title: title,
+      textBody: textBody,
+      _id: _id
+    }
+    this.state.notesList.push(createdNote);
+  }
+
   render() {
     return (
       <div className='App'>
@@ -41,7 +49,7 @@ class App extends Component {
         </div>
         <div className='viewContainer'>
           <Route exact path='/' render={ (props) => { return(<ListView {...props} notesList={this.state.notesList} setCurrentNote={this.setCurrentNote}/>)}} />
-          <Route path='/note/create' component={CreateNote} />
+          <Route path='/note/create' render={ (props) => { return(<CreateNote {...props} addCreatedNote={this.addCreatedNote} />)}} />
           <Route exact path='/:_id' render={ (props) => { return(<ViewNote {...props} currentNote={this.state.currentNote} />)}} />
           <Route path='/:_id/edit' component={EditNote} />
         </div>

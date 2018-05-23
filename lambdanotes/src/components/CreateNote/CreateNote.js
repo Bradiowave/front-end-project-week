@@ -4,25 +4,33 @@ import { Link } from 'react-router-dom';
 import './CreateNote.css';
 
 class CreateNote extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
-            title: '',
-            textBody: '',
+            newNote: {
+                title: '',
+                textBody: ''
+            },
+            newID: ''
         }
     }
 
     handleTitleChange = (e) => {
-        this.setState({ [e.target.name]: e.target.value })
+        this.setState({ newNote: { title: e.target.value, textBody: this.state.newNote.textBody } })
+    }
+
+    handleContentChange = (e) => {
+        this.setState({ newNote: { title: this.state.newNote.title, textBody: e.target.value } })
     }
 
     handleSaveNote = () => {
         axios
-            .post(`https://killer-notes.herokuapp.com/note/create`, this.state)
-                .then(res => {console.log(res)})
+            .post(`https://killer-notes.herokuapp.com/note/create`, this.state.newNote)
+                .then(res => {this.setState({ newID: res.data })})
                 .catch(err => {console.log(err)})
 
-        window.location.reload();
+        this.props.addCreatedNote(this.state.newNote.title, this.state.newNote.textBody, this.state.newID);
+        this.setState({ newNote: {title: '', textBody: ''}, newID: '' });
     }
 
     render() {
@@ -41,7 +49,7 @@ class CreateNote extends Component {
                         placeholder='Note Title' 
                     />
                     <textarea
-                        onChange={this.handleTitleChange}
+                        onChange={this.handleContentChange}
                         type='text' 
                         className='createNoteInputContent' 
                         name='textBody'
@@ -49,7 +57,7 @@ class CreateNote extends Component {
                         placeholder='Note Content'>
                     </textarea>
                     <div className='cnEntireLink'>
-                        <Link to={`/`}>
+                        <Link to={`/${this.state.newID}`}>
                             <input onClick={this.handleSaveNote} className='createNoteSaveButton' type='button' value='Save' />
                         </Link>
                     </div>
